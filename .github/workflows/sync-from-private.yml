@@ -1,0 +1,154 @@
+name: Sync from Private Repository
+
+on:
+  repository_dispatch:
+    types: [release-created]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version to sync'
+        required: true
+        type: string
+      dry_run:
+        description: 'Dry run mode'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  sync-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout public repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Git
+        run: |
+          git config --global user.name "PPDM CLI Release Bot"
+          git config --global user.email "release-bot@bottkars.com"
+
+      - name: Extract version
+        id: version
+        run: |
+          if [[ -n "${{ github.event.inputs.version }}" ]]; then
+            VERSION="${{ github.event.inputs.version }}"
+          elif [[ -n "${{ github.event.client_payload.version }}" ]]; then
+            VERSION="${{ github.event.client_payload.version }}"
+          else
+            echo "No version provided"
+            exit 1
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Create GitHub Release
+        if: github.event.inputs.dry_run != 'true'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ env.VERSION }}
+          name: PPDM CLI v${{ env.VERSION }}
+          body: |
+            # PPDM CLI ${{ env.VERSION }}
+            
+            ## 🚀 What's New
+            
+            This release includes:
+            - Enhanced backup and restore operations
+            - Improved filtering capabilities
+            - Web monitoring interface
+            - Comprehensive command documentation
+            - Bug fixes and performance improvements
+            
+            ## 📦 Installation
+            
+            ### Binary Download
+            Download the appropriate binary for your platform:
+            
+            ```bash
+            # Linux AMD64
+            wget https://github.com/bottkars/ppdm-cli/releases/download/v${{ env.VERSION }}/ppdm-cli-linux-amd64
+            chmod +x ppdm-cli-linux-amd64
+            sudo mv ppdm-cli-linux-amd64 /usr/local/bin/ppdm-cli
+            
+            # macOS AMD64
+            wget https://github.com/bottkars/ppdm-cli/releases/download/v${{ env.VERSION }}/ppdm-cli-darwin-amd64
+            chmod +x ppdm-cli-darwin-amd64
+            sudo mv ppdm-cli-darwin-amd64 /usr/local/bin/ppdm-cli
+            
+            # Windows AMD64
+            wget https://github.com/bottkars/ppdm-cli/releases/download/v${{ env.VERSION }}/ppdm-cli-windows-amd64.exe
+            # Add to PATH
+            ```
+            
+            ### ORAS Registry
+            Download using ORAS:
+            
+            ```bash
+            # Install ORAS
+            curl -LO https://github.com/oras-project/oras/releases/download/v0.16.0/oras_0.16.0_linux_amd64.tar.gz
+            tar -xzf oras_0.16.0_linux_amd64.tar.gz
+            
+            # Download PPDM CLI
+            oras pull quay.io/delldps/ppdm-cli:${{ env.VERSION }}-linux-amd64
+            ```
+            
+            ### Docker
+            ```bash
+            docker run --rm -it quay.io/delldps/ppdm-cli:${{ env.VERSION }} version
+            ```
+            
+            ## 🔧 Verification
+            
+            Verify the downloaded binary:
+            
+            ```bash
+            ppdm-cli version
+            # Expected: PPDM CLI Version: ${{ env.VERSION }}
+            ```
+            
+            ## 📋 Platform Support
+            
+            - ✅ Linux (AMD64, ARM64)
+            - ✅ macOS (AMD64, ARM64)
+            - ✅ Windows (AMD64)
+            - ✅ FreeBSD (AMD64)
+            
+            ## 📚 Documentation
+            
+            Full documentation is available in this repository:
+            - [Command Reference](docs/COMMAND_REFERENCE.md)
+            - [Installation Guide](docs/README.md)
+            - [Release Guide](RELEASE_GUIDE.md)
+            
+            ## 🔗 Links
+            
+            - [Private Repository](https://github.com/bottkars/agentic-ppdm-cli)
+            - [ORAS Registry](https://quay.io/repository/delldps/ppdm-cli)
+            - [Issues & Support](https://github.com/bottkars/ppdm-cli/issues)
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Release Summary
+        run: |
+          echo "## 🚀 PPDM CLI v${{ env.VERSION }} Released!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### ✅ Public Repository Setup:" >> $GITHUB_STEP_SUMMARY
+          echo "- [x] Repository initialized" >> $GITHUB_STEP_SUMMARY
+          echo "- [x] Documentation synced" >> $GITHUB_STEP_SUMMARY
+          echo "- [x] GitHub release created" >> $GITHUB_STEP_SUMMARY
+          echo "- [x] Installation guides available" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📦 Distribution:" >> $GITHUB_STEP_SUMMARY
+          echo "- **Public Repository**: https://github.com/bottkars/ppdm-cli" >> $GITHUB_STEP_SUMMARY
+          echo "- **GitHub Releases**: https://github.com/bottkars/ppdm-cli/releases/tag/v${{ env.VERSION }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **ORAS Registry**: quay.io/delldps/ppdm-cli:${{ env.VERSION }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Documentation**: https://github.com/bottkars/ppdm-cli#readme" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🔗 Quick Links:" >> $GITHUB_STEP_SUMMARY
+          echo "- [Download Binaries](https://github.com/bottkars/ppdm-cli/releases/tag/v${{ env.VERSION }})" >> $GITHUB_STEP_SUMMARY
+          echo "- [View Documentation](https://github.com/bottkars/ppdm-cli#readme)" >> $GITHUB_STEP_SUMMARY
+          echo "- [ORAS Registry](https://quay.io/repository/delldps/ppdm-cli)" >> $GITHUB_STEP_SUMMARY

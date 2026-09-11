@@ -1,0 +1,14 @@
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: ppdm-cli
+  labels:
+    app: ppdm-cli
+spec:
+  tags:
+  - from:
+      kind: DockerImage
+      name: quay.io/delldps/ppdm-cli:20.1.0.0-9
+    name: "20.1.0.0-9"
+    referencePolicy:
+      type: Source

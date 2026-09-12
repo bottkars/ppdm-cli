@@ -208,6 +208,29 @@ ppdm-cli backup [subcommand] [flags]
 ```
 **Description**: Create backup operations with protection policy enforcement.
 
+**Available subcommands:**
+- `create` - Create a manual backup for assets (API: CreateProtection)
+- `server-dr` - Manage server disaster recovery backups (API: getServerDrBackups, createServerDrBackup, deleteServerDrBackup, getServerDrBackup, updateServerDrBackup)
+- `vm-settings` - Manage VM backup settings (API: getVmBackupSettings, updateVmBackupSettings)
+- `reconcile` - Reconcile backup metadata (API: server-disaster-recovery-backup-reconciliation)
+
+**Examples:**
+```bash
+# Create manual backup
+ppdm-cli backup create --assets asset1,asset2
+
+# List server DR backups
+ppdm-cli backup server-dr list
+
+# Get VM backup settings
+ppdm-cli backup vm-settings get
+
+# Reconcile backup metadata
+ppdm-cli backup reconcile --backup-id backup-123
+```
+
+**Detailed documentation:** See [Backup Command Reference](commands/BACKUP.md) for comprehensive documentation.
+
 #### Backup Browser {#backup-browser}
 ```bash
 ppdm-cli backup-browser [flags]

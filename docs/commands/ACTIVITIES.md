@@ -16,9 +16,14 @@ ppdm-cli activities list [flags]
 ```
 
 #### Flags
-- `-f, --filter string` - Filter expression (e.g., 'status eq "RUNNING"')
-- `--orderby string` - Order by field (e.g., "name asc")
+- `--filter string` - Filter expression (e.g., 'state eq "RUNNING"')
+- `--state string` - Filter by activity state (COMPLETED, RUNNING, QUEUED, CANCELING, RETRYING)
+- `--category string` - Filter by activity category
+- `--type string` - Filter by activity type (TASK, JOB, JOB_GROUP)
+- `--orderby string` - Order by field (e.g., "startedAt DESC")
 - `-o, --output string` - Output format (table, json, yaml, csv, json-raw, yaml-raw)
+- `--page int` - Page number for pagination
+- `--page-size int` - Number of items per page (default 100)
 - `-h, --help` - Help for list command
 
 #### Examples
@@ -35,70 +40,70 @@ ppdm-cli activities list --help
 ##### Status Filtering
 ```bash
 # List running activities
-ppdm-cli activities list --filter 'status eq "RUNNING"'
+ppdm-cli activities list --state "RUNNING"
 
 # List completed activities
-ppdm-cli activities list --filter 'status eq "COMPLETED"'
+ppdm-cli activities list --state "COMPLETED"
 
 # List failed activities
-ppdm-cli activities list --filter 'status eq "FAILED"'
+ppdm-cli activities list --result "FAILED"
 
 # List cancelled activities
-ppdm-cli activities list --filter 'status eq "CANCELED"'
+ppdm-cli activities list --state "CANCELING"
 
 # List activities with warnings
-ppdm-cli activities list --filter 'status eq "COMPLETED_WITH_WARNINGS"'
+ppdm-cli activities list --result "COMPLETED_WITH_EXCEPTIONS"
 ```
 
 ##### Type Filtering
 ```bash
 # List backup activities
-ppdm-cli activities list --filter 'type eq "BACKUP"'
+ppdm-cli activities list --category "BACKUP"
 
 # List restore activities
-ppdm-cli activities list --filter 'type eq "RESTORE"'
+ppdm-cli activities list --category "RESTORE"
 
 # List replication activities
-ppdm-cli activities list --filter 'type eq "REPLICATION"'
+ppdm-cli activities list --category "REPLICATE"
 
 # List discovery activities
-ppdm-cli activities list --filter 'type eq "DISCOVERY"'
+ppdm-cli activities list --category "DISCOVERY"
 ```
 
 ##### Time-based Filtering
 ```bash
 # List activities from today
-ppdm-cli activities list --filter 'startTime ge "2024-01-01T00:00:00Z"'
+ppdm-cli activities list --latest
 
-# List activities from last 24 hours
-ppdm-cli activities list --filter 'startTime ge "$(date -d '1 day ago' -Iseconds)"'
+# List activities with custom filter
+ppdm-cli activities list --filter 'startedAt ge "2024-01-01T00:00:00Z"'
 
 # List activities in date range
-ppdm-cli activities list --filter 'startTime ge "2024-01-01T00:00:00Z" and startTime le "2024-01-31T23:59:59Z"'
+ppdm-cli activities list --filter 'startedAt ge "2024-01-01T00:00:00Z" and startedAt le "2024-01-31T23:59:59Z"'
 ```
 
 ##### Asset-based Filtering
 ```bash
 # List activities for specific asset
-ppdm-cli activities list --filter 'asset/name co "database"'
+ppdm-cli activities list --search "database"
 
-# List activities for specific asset ID
-ppdm-cli activities list --filter 'asset/id eq "asset-id"'
+# List activities with custom filter
+ppdm-cli activities list --filter 'assetRef.name lk "%database%"'
 
 # List activities for multiple assets
-ppdm-cli activities list --filter 'asset/name co "server" or asset/name co "database"'
+ppdm-cli activities list --filter 'assetRef.name lk "%server%" or assetRef.name lk "%database%"'
 ```
 
 ##### Combined Filtering
 ```bash
-# Combine status and type filters
-ppdm-cli activities list --filter 'status eq "RUNNING" and type eq "BACKUP"'
+# Combine state and category filters
+ppdm-cli activities list --state "RUNNING" --category "BACKUP"
 
 # Complex filter with multiple conditions
-ppdm-cli activities list --filter 'status eq "FAILED" and type eq "BACKUP" and startTime ge "2024-01-01T00:00:00Z"'
+ppdm-cli activities list --filter 'state eq "FAILED" and category eq "BACKUP" and startedAt ge "2024-01-01T00:00:00Z"'
 
 # Filter by policy name
-ppdm-cli activities list --filter 'policy/name eq "Daily Backup"'
+ppdm-cli activities list --filter 'protectionPolicy.name eq "Daily Backup"'
 ```
 
 ##### Output Formats
@@ -125,16 +130,16 @@ ppdm-cli activities list --output yaml-raw
 ##### Pagination and Sorting
 ```bash
 # Custom page size
-ppdm-cli activities list --page 1 --size 50
+ppdm-cli activities list --page 1 --page-size 50
 
 # Order by start time (newest first)
-ppdm-cli activities list --orderby "startTime desc"
+ppdm-cli activities list --orderby "startedAt DESC"
 
 # Order by activity name
-ppdm-cli activities list --orderby "name asc"
+ppdm-cli activities list --orderby "name ASC"
 
-# Order by status
-ppdm-cli activities list --orderby "status asc"
+# Order by state
+ppdm-cli activities list --orderby "state ASC"
 ```
 
 #### Output Fields
@@ -196,7 +201,7 @@ ppdm-cli activities monitor [flags]
 ```
 
 #### Flags
-- `-f, --filter string` - Filter expression for monitoring
+- `--filter string` - Filter expression for monitoring
 - `--refresh-interval duration` - Refresh interval (default 5s)
 - `-o, --output string` - Output format (table, json)
 - `-h, --help` - Help for monitor command

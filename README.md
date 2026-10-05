@@ -5,7 +5,6 @@
 [![Go Version](https://img.shields.io/badge/Go-1.26.4-00ADD8?style=flat&logo=go)](https://golang.org)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Release](https://img.shields.io/github/v/release/bottkars/ppdm-cli)](https://github.com/bottkars/ppdm-cli/releases)
-[![Build Status](https://github.com/bottkars/ppdm-cli/workflows/CI/badge.svg)](https://github.com/bottkars/ppdm-cli/actions)
 [![ORAS](https://img.shields.io/badge/oras-registry-orange.svg)](https://quay.io/repository/delldps/ppdm-cli)
 
 ## 🎯 Quick Start

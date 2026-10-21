@@ -62,6 +62,7 @@
 | **verify-cloud-storage** | Verify cloud storage profile connection | [Cloud Storage Verification](#cloud-storage-verification) |
 | **verify-object-storage** | Verify object storage profile connection | [Object Storage Verification](#object-storage-verification) |
 | **version** | Show version information | [Version](#version) |
+| **features** | Manage PPDM features and capabilities | [Features Management](#features-management) |
 
 ### 📚 Detailed Sections
 - [Global Configuration](#-global-configuration) - Multi-host setup and environment variables
@@ -1885,6 +1886,77 @@ Error: failed to create client: connection refused: dial tcp ppdm-baremetal.home
 - Successful connection to `ppdm-baremetal.home.labbuildr.com`
 
 **🎉 READY FOR PRODUCTION ON PPDM-BAREMETAL!**
+
+## 🎛️ Features Management {#features-management}
+
+Manage PPDM features and capabilities using the features command.
+
+### List Features
+```bash
+# List all features
+ppdm-cli features list
+
+# Filter by status
+ppdm-cli features list --filter 'status eq "ENABLED"'
+ppdm-cli features list --filter 'status eq "DISABLED"'
+
+# Filter by ID
+ppdm-cli features list --filter 'id eq "VM_DIRECT"'
+
+# With pagination
+ppdm-cli features list --page 1 --page-size 20
+```
+
+### Show Feature Details
+```bash
+# Show feature by ID
+ppdm-cli features show VM_DIRECT
+ppdm-cli features show --id VM_DIRECT
+
+# Output in JSON
+ppdm-cli features show VM_DIRECT --output json
+```
+
+### Batch Update Feature Status
+```bash
+# Enable feature
+cat > enable-feature.json <<EOF
+{
+  "requests": [
+    {
+      "id": "1",
+      "body": {
+        "id": "NAS_NDMP",
+        "status": "ENABLED"
+      }
+    }
+  ]
+}
+EOF
+ppdm-cli features batch-update --file enable-feature.json
+
+# Disable feature
+cat > disable-feature.json <<EOF
+{
+  "requests": [
+    {
+      "id": "1",
+      "body": {
+        "id": "NAS_NDMP",
+        "status": "DISABLED"
+      }
+    }
+  ]
+}
+EOF
+ppdm-cli features batch-update --file disable-feature.json
+```
+
+**API Operation:** getFeatures, patchFeaturesBatch  
+**API Version:** v2  
+**API Reference:** ppdm-public-v2-20.3.0.0.yaml
+
+For detailed documentation, see [Features Command Reference](commands/FEATURES.md).
 
 ## 🔧 Advanced Usage {#advanced-usage}
 

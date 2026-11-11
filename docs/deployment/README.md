@@ -6,6 +6,28 @@ This section contains comprehensive deployment guides for PPDM CLI in various en
 
 ## 📋 Deployment Options
 
+### 🍺 Homebrew Deployment
+
+Install PPDM CLI via Homebrew on macOS:
+
+```bash
+# Tap the repository
+brew tap bottkars/tap
+
+# Install
+brew install --cask ppdm-cli
+
+# Configure
+export PPDM_HOST=ppdm.example.com
+export PPDM_USERNAME=admin
+export PPDM_PASSWORD=your-password
+
+# Use
+ppdm-cli assets list
+```
+
+For detailed instructions, see [Homebrew Deployment Guide](HOMEBREW_DEPLOYMENT.md).
+
 ### 🐳 Container Deployment
 - [Docker Deployment](DOCKER_DEPLOYMENT.md) - Docker and container usage guide
 - [Container AI Deployment](CONTAINER_AI_DEPLOYMENT.md) - AI-assisted container deployment
